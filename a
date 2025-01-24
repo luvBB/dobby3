@@ -1,15 +1,116 @@
 // ==UserScript==
-// @name         Dobby2
+// @name         Dobby2 Enhanced with Menu and Map Actions
 // @namespace    http://tampermonkey.net/
-// @version      1.51
-// @description  Dobby
+// @version      1.59
+// @description  Enhanced Dobby Script with Random Menu Actions and Map Clicks
 // @author       xxxx
-// @include https://*.the-west.*/game.php*
+// @include      https://*.the-west.*/game.php*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
-// @downloadURL https://update.greasyfork.org/scripts/492063/Dobby2.user.js
-// @updateURL https://update.greasyfork.org/scripts/492063/Dobby2.meta.js
+// @downloadURL  https://update.greasyfork.org/scripts/492063/Dobby2.user.js
+// @updateURL    https://update.greasyfork.org/scripts/492063/Dobby2.meta.js
 // ==/UserScript==
+
+(function() {
+    // Introduce random delay function to mimic human-like behavior
+    function randomDelay(min, max) {
+        return new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * (max - min + 1)) + min));
+    }
+
+    // Wait for an element to exist in the DOM
+    async function waitForElement(selector, timeout = 10000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const element = document.querySelector(selector);
+            if (element) return element;
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        console.warn(`Element ${selector} not found within ${timeout}ms.`);
+        return null;
+    }
+
+    // Open and toggle a menu (open on first click, close on second click)
+    async function openAndToggleMenu(menuSelector, actionDelayMin = 5000, actionDelayMax = 10000) {
+        const menu = await waitForElement(menuSelector);
+        if (menu) {
+            console.log(`Toggling menu: ${menuSelector}`);
+            menu.click(); // Open menu
+            await randomDelay(actionDelayMin, actionDelayMax); // Wait before toggling
+            menu.click(); // Close menu
+            console.log(`Menu toggled: ${menuSelector}`);
+        } else {
+            console.warn(`Menu ${menuSelector} not found.`);
+        }
+    }
+
+    // Simulate idle random actions
+    async function idleRandomActions() {
+        const menuSelectors = [
+            ".button.inventory.background",
+            ".button.duels.background",
+            ".button.city.background",
+            ".button.message.background",
+            ".char_links.ranking",
+            ".button.telegrams.background" // Telegrame
+        ];
+
+        const randomMenu = menuSelectors[Math.floor(Math.random() * menuSelectors.length)];
+        console.log(`Performing action on menu: ${randomMenu}`);
+        await openAndToggleMenu(randomMenu);
+    }
+
+    // Perform random clicks on the map
+    async function randomMapClicks() {
+        const map = await waitForElement("#map");
+        if (map) {
+            const rect = map.getBoundingClientRect();
+            const randomX = Math.floor(Math.random() * rect.width);
+            const randomY = Math.floor(Math.random() * rect.height);
+
+            console.log(`Clicking on random map location: (${randomX}, ${randomY})`);
+            map.dispatchEvent(new MouseEvent("click", {
+                bubbles: true,
+                cancelable: true,
+                clientX: rect.left + randomX,
+                clientY: rect.top + randomY
+            }));
+
+            await randomDelay(2000, 4000); // Pause after the map click
+        } else {
+            console.warn("Map element not found for random clicks.");
+        }
+    }
+
+    async function performTask() {
+        console.log("Starting task...");
+        await randomDelay(2000, 5000);
+
+        // Simulate random idle actions (menu interaction)
+        console.log("Performing idle actions...");
+        await idleRandomActions();
+
+        // Perform random map clicks
+        console.log("Performing random map clicks...");
+        await randomMapClicks();
+
+        console.log("Task completed!");
+    }
+
+    async function startBot() {
+        while (true) {
+            await performTask();
+            const interval = Math.floor(Math.random() * (90000 - 60000 + 1)) + 60000; // Random interval between 60-90 seconds
+            console.log(`Waiting ${interval / 1000} seconds before next task...`);
+            await randomDelay(interval, interval + 10000);
+        }
+    }
+
+    console.log("Bot script initialized");
+    startBot();
+})();
+
+
+
 
 (function() {
 
