@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dobby2 Enhanced with Menu and Map Actions
 // @namespace    http://tampermonkey.net/
-// @version      1.59
+// @version      1.60
 // @description  Enhanced Dobby Script with Random Menu Actions and Map Clicks
 // @author       xxxx
 // @include      https://*.the-west.*/game.php*
@@ -29,15 +29,23 @@
         return null;
     }
 
-    // Open and toggle a menu (open on first click, close on second click)
-    async function openAndToggleMenu(menuSelector, actionDelayMin = 5000, actionDelayMax = 10000) {
+    // Open a menu and close all menus using the close-all button
+    async function openAndCloseAllMenus(menuSelector, actionDelayMin = 5000, actionDelayMax = 10000) {
         const menu = await waitForElement(menuSelector);
+        const closeAllButton = document.querySelector(".tw2gui_window_buttons_closeall");
+
         if (menu) {
-            console.log(`Toggling menu: ${menuSelector}`);
+            console.log(`Opening menu: ${menuSelector}`);
             menu.click(); // Open menu
-            await randomDelay(actionDelayMin, actionDelayMax); // Wait before toggling
-            menu.click(); // Close menu
-            console.log(`Menu toggled: ${menuSelector}`);
+            await randomDelay(actionDelayMin, actionDelayMax); // Wait for a random delay
+
+            if (closeAllButton) {
+                console.log("Closing all menus using the close-all button.");
+                closeAllButton.click();
+            } else {
+                console.warn("Close-all button not found. Falling back to toggling the menu.");
+                menu.click(); // Fallback: Close the menu by toggling
+            }
         } else {
             console.warn(`Menu ${menuSelector} not found.`);
         }
@@ -50,14 +58,15 @@
             ".button.duels.background",
             ".button.city.background",
             ".button.multiplayer.background",
+            ".menulink.ltown",
+            ".menulink.lcharacter",
             ".button.message.background",
-            ".char_links.ranking",
-            ".button.jobs.background"
+            ".char_links.ranking"
         ];
 
         const randomMenu = menuSelectors[Math.floor(Math.random() * menuSelectors.length)];
         console.log(`Performing action on menu: ${randomMenu}`);
-        await openAndToggleMenu(randomMenu);
+        await openAndCloseAllMenus(randomMenu);
     }
 
     // Perform random clicks on the map
