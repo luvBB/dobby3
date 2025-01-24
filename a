@@ -49,9 +49,11 @@
             ".button.inventory.background",
             ".button.duels.background",
             ".button.city.background",
+            ".button.multiplayer.background",
             ".button.message.background",
+            ".character_link",
             ".char_links.ranking",
-            ".button.telegrams.background" // Telegrame
+            ".button.jobs.background"
         ];
 
         const randomMenu = menuSelectors[Math.floor(Math.random() * menuSelectors.length)];
