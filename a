@@ -51,7 +51,6 @@
             ".button.city.background",
             ".button.multiplayer.background",
             ".button.message.background",
-            ".character_link",
             ".char_links.ranking",
             ".button.jobs.background"
         ];
